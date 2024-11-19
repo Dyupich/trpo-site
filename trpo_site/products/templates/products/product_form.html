@@ -1,0 +1,24 @@
+<!-- products/templates/products/product_form.html -->
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Форма товара</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} товар</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href="{% url 'product_list' %}" class="btn btn-secondary">Отменить</a>
+        </form>
+    </div>
+</body>
+</html>
