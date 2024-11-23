@@ -16,8 +16,10 @@
             <thead>
                 <tr>
                     <th>Название товара</th>
-                    <th>Описание товара</th>
+                    <th>Категория товара</th>
+                    <th>Количество товара</th>
                     <th>Цена (руб.)</th>
+                    <th>Дата поступления товара</th>
                     <th>Действия с товаром</th>
                 </tr>
             </thead>
@@ -25,8 +27,10 @@
                 {% for product in products %}
                 <tr>
                     <td>{{ product.name }}</td>
-                    <td>{{ product.description }}</td>
+                    <td>{{ product.category }}</td>
+                    <td>{{ product.quantity }}</td>
                     <td>{{ product.price }}</td>
+                    <td>{{ product.incoming_date }}</td>
                     <td>
                         <a href="{% url 'product_edit' product.pk %}" class="btn btn-warning">Редактировать</a>
                         <a href="{% url 'product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
