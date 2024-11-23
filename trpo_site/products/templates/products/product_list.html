@@ -11,7 +11,40 @@
 <body>
     <div class="container">
         <h1 class="mt-4">Список товаров</h1>
-        <a href="{% url 'product_add' %}" class="btn btn-primary mb-3">Добавить товар</a>
+
+
+        <!-- Форма фильтрации -->
+        <form method="GET" class="mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="name" class="form-control" placeholder="Название товара" value="{{ request.GET.name }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="category" class="form-control" placeholder="Категория товара" value="{{ request.GET.category }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="number" name="min_price" class="form-control" placeholder="Минимальная цена" value="{{ request.GET.min_price }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="number" name="max_price" class="form-control" placeholder="Максимальная цена" value="{{ request.GET.max_price }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="number" name="min_quantity" class="form-control" placeholder="Минимальное количество" value="{{ request.GET.min_quantity }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="number" name="max_quantity" class="form-control" placeholder="Максимальное количество" value="{{ request.GET.max_quantity }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="date" name="incoming_date" class="form-control" value="{{ request.GET.incoming_date }}">
+                </div>
+            </div>
+            <hr>
+            <div class="col-sm">
+                <a href="{% url 'product_add' %}" class="btn btn-primary">Добавить товар</a>
+                <button type="submit" class="btn btn-success">Фильтровать</button>
+                <a href="{% url 'product_list' %}" class="btn btn-secondary">Сбросить</a>
+            </div>
+        </form>
         <table class="table">
             <thead>
                 <tr>
