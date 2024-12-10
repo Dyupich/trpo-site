@@ -1,23 +1,81 @@
-<!-- products/templates/products/product_form.html -->
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Форма товара</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <title>{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} товар</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 500px;
+        }
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-control {
+            width: 100%;
+            height: 45px;
+        }
+        .btn-primary {
+            background-color: #0056b3;
+            border: none;
+            padding: 10px 20px;
+        }
+        .btn-primary:hover {
+            background-color: #00408b;
+        }
+        .btn-secondary {
+            border: none;
+            padding: 10px 20px;
+        }
+        .btn-secondary:hover {
+            background-color: #d6d6d6;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="mt-4">{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} товар</h1>
+    <div class="container bg-white p-4 rounded shadow">
+        <h1>{% if form.instance.pk %}Редактировать{% else %}Добавить{% endif %} товар</h1>
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
-                {{ form.as_p }}
+                <label for="name">Наименование:</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ form.name.value }}">
             </div>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-            <a href="{% url 'product_list' %}" class="btn btn-secondary">Отменить</a>
+            <div class="form-group">
+                <label for="category">Категория:</label>
+                <input type="text" id="category" name="category" class="form-control" value="{{ form.category.value }}">
+            </div>
+            <div class="form-group">
+                <label for="quantity">Количество:</label>
+                <input type="number" id="quantity" name="quantity" class="form-control" value="{{ form.quantity.value }}">
+            </div>
+            <div class="form-group">
+                <label for="price">Цена:</label>
+                <input type="text" id="price" name="price" class="form-control" value="{{ form.price.value }}">
+            </div>
+            <div class="form-group">
+                <label for="incoming_date">Дата поступления:</label>
+                <input type="datetime-local" id="incoming_date" name="incoming_date" class="form-control" value="{{ form.incoming_date.value }}">
+            </div>
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary me-2">Сохранить</button>
+                <a href="{% url 'product_list' %}" class="btn btn-secondary">Отменить</a>
+            </div>
         </form>
     </div>
 </body>
