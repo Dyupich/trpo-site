@@ -29,7 +29,61 @@
             margin-right: 10px;
         }
     </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Функция для обновления итоговой суммы
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll('tbody tr').forEach(function (row) {
+                const quantityInput = row.querySelector('.quantity-input');
+                const price = parseFloat(row.querySelector('.product-price').textContent) || 0;
+                const quantity = parseInt(quantityInput.value) || 0;
+                total += price * quantity;
+            });
+            document.getElementById('total').value = total.toFixed(2); // Обновляем поле с итогом
+        }
+
+        // Обработчик для кнопки "+"
+        document.querySelectorAll('.btn-plus').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const row = button.closest('tr');
+                const quantityInput = row.querySelector('.quantity-input');
+                const quantityMax = row.querySelector('.product-quantity').textContent;
+                let currentQuantity = parseInt(quantityInput.value) || 0;
+                const currentQuantityMax = parseFloat(row.querySelector('.product-quantity').textContent) || 0;
+                if (currentQuantityMax <= currentQuantity) return;
+                console.log(currentQuantityMax);
+                quantityInput.value = currentQuantity + 1;
+                updateTotal(); // Обновляем итоговую сумму
+            });
+        });
+
+        // Обработчик для кнопки "-"
+        document.querySelectorAll('.btn-minus').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const row = button.closest('tr');
+                const quantityInput = row.querySelector('.quantity-input');
+                let currentQuantity = parseInt(quantityInput.value) || 0;
+                if (currentQuantity > 0) {
+                    quantityInput.value = currentQuantity - 1;
+                    updateTotal(); // Обновляем итоговую сумму
+                }
+            });
+        });
+
+        // Обработчик для изменения вручную значения в поле input
+        document.querySelectorAll('.quantity-input').forEach(function (input) {
+            input.addEventListener('input', function () {
+                updateTotal(); // Обновляем итоговую сумму
+            });
+        });
+
+        // Инициализируем итоговую сумму при загрузке
+        updateTotal();
+    });
+    </script>
 </head>
+
 <body>
     <div class="container">
         <h1>Список товаров</h1>
@@ -82,21 +136,84 @@
                 </thead>
                 <tbody>
                     {% for product in products %}
-                    <tr>
+                    <tr data-product-id="{{ product.id }}">
                         <td>{{ product.name }}</td>
                         <td>{{ product.category }}</td>
-                        <td>{{ product.quantity }}</td>
-                        <td>{{ product.price }}</td>
+                        <td class="product-quantity">{{ product.quantity }}</td>
+                        <td class="product-price">{{ product.price }}</td>
                         <td>{{ product.incoming_date }}</td>
-                        <td>
+                        <td class="col-auto">
                             <a href="{% url 'product_edit' product.pk %}" class="btn btn-warning btn-sm">Редактировать</a>
                             <a href="{% url 'product_delete' product.pk %}" class="btn btn-danger btn-sm">Удалить</a>
+                            <button class="btn btn-info btn-sm btn-plus">+</button>
+                            <input type="number" name="quantity" class="form-control d-inline quantity-input" style="width: 20%" placeholder="0">
+                            <button class="btn btn-info btn-sm btn-minus">-</button>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        <form id="purchaseForm" class="row g-3">
+          <div class="col-auto">
+            <input type="text" readonly class="form-control-plaintext" value="Итоговая сумма = ">
+          </div>
+          <div class="col-auto">
+            <input type="text" readonly class="form-control" id="total" placeholder="Сумма">
+          </div>
+          <div class="col-auto">
+              {% csrf_token %}
+            <button type="button" id="purchaseButton" class="btn btn-primary mb-3">Купить</button>
+          </div>
+        </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (!csrfTokenElement) {
+                console.error('CSRF токен не найден на странице.');
+                return;
+            }
+
+            const csrfToken = csrfTokenElement.value;
+            const purchaseButton = document.getElementById('purchaseButton');
+
+            if (purchaseButton) {
+                purchaseButton.addEventListener('click', function () {
+                    const purchaseData = {};
+                    document.querySelectorAll('tbody tr').forEach(function (row) {
+                        const productId = row.getAttribute('data-product-id');
+                        const quantityInput = row.querySelector('.quantity-input');
+                        const quantity = parseInt(quantityInput.value) || 0;
+                        if (quantity > 0) {
+                            purchaseData[productId] = quantity;
+                        }
+                    });
+
+                    fetch('/purchase-products/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                        },
+                        body: JSON.stringify(purchaseData),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert('Ошибка: ' + data.error);
+                        } else {
+                            alert(data.message);
+                            window.location.reload(); // Обновляем страницу
+                        }
+                    })
+                    .catch(error => console.error('Ошибка:', error));
+                });
+            } else {
+                console.error('Кнопка с ID "purchaseButton" не найдена.');
+            }
+        });
+    </script>
 </body>
 </html>
