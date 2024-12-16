@@ -6,6 +6,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product
 from .forms import ProductForm
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 class ProductWorker:
     @classmethod
@@ -68,3 +71,23 @@ class ProductWorker:
             product.delete()
             return redirect('product_list')
         return render(request, 'products/product_confirm_delete.html', {'product': product})
+
+    @csrf_exempt
+    def purchase_products(request):
+        if request.method == 'POST':
+            try:
+                data = json.loads(request.body)
+                for product_id, quantity in data.items():
+                    product = Product.objects.get(id=product_id)
+                    if product.quantity >= quantity:
+                        product.quantity -= quantity
+                        product.save()
+                    else:
+                        return JsonResponse({'error': f'Недостаточно товара: {product.name}'}, status=400)
+                return JsonResponse({'message': 'Покупка успешна!'})
+            except Product.DoesNotExist:
+                return JsonResponse({'error': 'Товар не найден!'}, status=404)
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=500)
+        else:
+            return JsonResponse({'error': 'Неверный метод запроса'}, status=405)
