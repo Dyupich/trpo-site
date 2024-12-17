@@ -84,7 +84,7 @@ class ProductWorker:
                         product.save()
                     else:
                         return JsonResponse({'error': f'Недостаточно товара: {product.name}'}, status=400)
-                return JsonResponse({'message': 'Покупка успешна!'})
+                return JsonResponse({'message': 'Товар зарезервирован!'})
             except Product.DoesNotExist:
                 return JsonResponse({'error': 'Товар не найден!'}, status=404)
             except Exception as e:
